@@ -115,6 +115,28 @@ namespace BankingSystem.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Login([Bind(Include = "username,password")] Employee employee)
+        {
+            List<Employee> emp = db.Employees.Where(e => e.username == employee.username && e.password == employee.password).ToList();
+            if (emp.Count == 0)
+            {
+                return View();
+            }
+            else
+            {
+                Session["username"] = employee.username;
+                Session["role"] = "employee";
+                return RedirectToAction("Index");
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

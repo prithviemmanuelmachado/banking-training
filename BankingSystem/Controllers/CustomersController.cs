@@ -46,13 +46,18 @@ namespace BankingSystem.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Password,FirstName,LastName,Address,Gender,DOB,ContactNumber,Email")] Customer customer)
+        public ActionResult Create([Bind(Include = "FirstName,LastName,Address,Gender,DOB,ContactNumber,Email")] Customer customer)
         {
             if (ModelState.IsValid)
             {
+                Random random = new Random();
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                customer.Password = new string(Enumerable.Repeat(chars, chars.Length)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
+                
                 db.Customers.Add(customer);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Employees");
             }
 
             return View(customer);
@@ -113,6 +118,28 @@ namespace BankingSystem.Controllers
             db.Customers.Remove(customer);
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Login([Bind(Include = "ID,Password")] Customer customer)
+        {
+            List<Customer> cust = db.Customers.Where(e => e.ID == customer.ID && e.Password == customer.Password).ToList();
+            if (cust.Count == 0)
+            {
+                return View();
+            }
+            else
+            {
+                Session["username"] = customer.ID;
+                Session["role"] = "customer";
+                return RedirectToAction("Index");
+            }
         }
 
         protected override void Dispose(bool disposing)
