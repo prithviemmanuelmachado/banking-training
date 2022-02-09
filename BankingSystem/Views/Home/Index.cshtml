@@ -2,5 +2,12 @@
     ViewBag.Title = "Home Page";
 }
 
-@Html.ActionLink("Employee Login", "Login", "Employees")||
-@Html.ActionLink("Customer Login", "Login", "Customers")
+<div class="row">
+    <div class="col-6">
+        @Html.ActionLink("Employee Login", "Login", "Employees")
+    </div>
+    <div class="col-6">
+        @Html.ActionLink("Customer Login", "Login", "Customers")
+    </div>  
+</div>
+

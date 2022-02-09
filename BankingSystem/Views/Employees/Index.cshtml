@@ -4,4 +4,15 @@
     ViewBag.Title = "Index";
 }
 
-@Html.ActionLink("Create customer", "Create", "Customers")
+
+<div class="row">
+    <div class="col-4">
+        @Html.ActionLink("Create customer", "Create", "Customers")
+    </div>
+    <div class="col-4">
+        @Html.ActionLink("Search customer", "Search", "Employees")
+    </div>
+    <div class="col-4">
+        @Html.ActionLink("Logout", "Logout", "Home")
+    </div>
+</div>

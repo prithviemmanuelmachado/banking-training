@@ -4,3 +4,14 @@
     ViewBag.Title = "Index";
 }
 
+<div class="row">
+    <div class="col-4">
+        @Html.ActionLink("Accounts", "Index", "Accounts")
+    </div>
+    <div class="col-4">
+        @Html.ActionLink("Transactions", "Statement")
+    </div>
+    <div class="col-4">
+        @Html.ActionLink("Logout", "Logout", "Home")
+    </div>
+</div>

@@ -10,21 +10,23 @@ namespace BankingSystem.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            if (Session["username"] != null)
+            {
+                if (Session["role"].ToString() == "customer")
+                    return RedirectToAction("Index", "Customers");
+                else
+                    return RedirectToAction("Index", "Employees");
+            }
+            else
+                return View();
         }
 
-        public ActionResult About()
+        public ActionResult Logout()
         {
-            ViewBag.Message = "Your application description page.";
+            Session.Remove("username");
+            Session.Remove("role");
+            return RedirectToAction("Index");
 
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
         }
     }
 }

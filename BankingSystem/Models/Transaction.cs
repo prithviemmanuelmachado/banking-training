@@ -18,6 +18,7 @@ namespace BankingSystem.Models
         public Nullable<int> FromAccountNumber { get; set; }
         public Nullable<int> ToAccountNumber { get; set; }
         public string ToBankName { get; set; }
+        public Nullable<int> Amount { get; set; }
     
         public virtual Account Account { get; set; }
     }

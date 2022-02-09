@@ -17,29 +17,14 @@ namespace BankingSystem.Controllers
         // GET: Accounts
         public ActionResult Index()
         {
-            var accounts = db.Accounts.Include(a => a.Customer);
+            int id = Int32.Parse(Session["username"].ToString());
+            var accounts = db.Accounts.Where(a => a.CustomerID == id);
             return View(accounts.ToList());
-        }
-
-        // GET: Accounts/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Account account = db.Accounts.Find(id);
-            if (account == null)
-            {
-                return HttpNotFound();
-            }
-            return View(account);
         }
 
         // GET: Accounts/Create
         public ActionResult Create()
         {
-            ViewBag.CustomerID = new SelectList(db.Customers, "ID", "Password");
             return View();
         }
 
@@ -48,76 +33,24 @@ namespace BankingSystem.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,CustomerID,Balance")] Account account)
+        public ActionResult Create([Bind(Include = "Balance")] Account account)
         {
-            if (ModelState.IsValid)
-            {
-                db.Accounts.Add(account);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.CustomerID = new SelectList(db.Customers, "ID", "Password", account.CustomerID);
-            return View(account);
-        }
-
-        // GET: Accounts/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Account account = db.Accounts.Find(id);
-            if (account == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.CustomerID = new SelectList(db.Customers, "ID", "Password", account.CustomerID);
-            return View(account);
-        }
-
-        // POST: Accounts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,CustomerID,Balance")] Account account)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(account).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            ViewBag.CustomerID = new SelectList(db.Customers, "ID", "Password", account.CustomerID);
-            return View(account);
-        }
-
-        // GET: Accounts/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Account account = db.Accounts.Find(id);
-            if (account == null)
-            {
-                return HttpNotFound();
-            }
-            return View(account);
-        }
-
-        // POST: Accounts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Account account = db.Accounts.Find(id);
-            db.Accounts.Remove(account);
+            account.CustomerID = Int32.Parse(Session["CustID"].ToString());
+            db.Accounts.Add(account);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Customers");
+        }
+
+        public ActionResult Statement(int id)
+        {
+            Session["AccountID"] = id;
+            return RedirectToAction("Index", "Transactions");
+        }
+
+        public ActionResult Transact(int id)
+        {
+            Session["AccountID"] = id;
+            return RedirectToAction("Create", "Transactions");
         }
 
         protected override void Dispose(bool disposing)

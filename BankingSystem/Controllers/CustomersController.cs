@@ -21,13 +21,11 @@ namespace BankingSystem.Controllers
         }
 
         // GET: Customers/Details/5
-        public ActionResult Details(int? id)
+        public ActionResult Details()
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
+            int id = Int32.Parse(Session["CustID"].ToString());
             Customer customer = db.Customers.Find(id);
+            ViewBag.Accounts = db.Accounts.Where(a => a.CustomerID == id).ToList();
             if (customer == null)
             {
                 return HttpNotFound();
@@ -63,63 +61,6 @@ namespace BankingSystem.Controllers
             return View(customer);
         }
 
-        // GET: Customers/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Customer customer = db.Customers.Find(id);
-            if (customer == null)
-            {
-                return HttpNotFound();
-            }
-            return View(customer);
-        }
-
-        // POST: Customers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Password,FirstName,LastName,Address,Gender,DOB,ContactNumber,Email")] Customer customer)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(customer).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(customer);
-        }
-
-        // GET: Customers/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Customer customer = db.Customers.Find(id);
-            if (customer == null)
-            {
-                return HttpNotFound();
-            }
-            return View(customer);
-        }
-
-        // POST: Customers/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Customer customer = db.Customers.Find(id);
-            db.Customers.Remove(customer);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
         public ActionResult Login()
         {
             return View();
@@ -140,6 +81,12 @@ namespace BankingSystem.Controllers
                 Session["role"] = "customer";
                 return RedirectToAction("Index");
             }
+        }
+
+        public ActionResult Statement()
+        {
+            Session.Remove("AccountID");
+            return RedirectToAction("Index", "Transactions");
         }
 
         protected override void Dispose(bool disposing)

@@ -43,6 +43,7 @@
           <Property Name="FromAccountNumber" Type="int" />
           <Property Name="ToAccountNumber" Type="int" />
           <Property Name="ToBankName" Type="varchar(max)" />
+          <Property Name="Amount" Type="int" />
         </EntityType>
         <Association Name="FK__Account__Custome__2A4B4B5E">
           <End Role="Customer" Type="Self.Customer" Multiplicity="0..1" />
@@ -128,6 +129,7 @@
           <Property Name="ToAccountNumber" Type="Int32" />
           <Property Name="ToBankName" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Account" Relationship="Self.FK__Transacti__FromA__2D27B809" FromRole="Transactions" ToRole="Account" />
+          <Property Name="Amount" Type="Int32" />
         </EntityType>
         <Association Name="FK__Account__Custome__2A4B4B5E">
           <End Role="Customer" Type="Self.Customer" Multiplicity="0..1" />
@@ -209,6 +211,7 @@
           <EntitySetMapping Name="Transactions">
             <EntityTypeMapping TypeName="BankingModel.Transaction">
               <MappingFragment StoreEntitySet="Transactions">
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="FromAccountNumber" ColumnName="FromAccountNumber" />
                 <ScalarProperty Name="ToAccountNumber" ColumnName="ToAccountNumber" />

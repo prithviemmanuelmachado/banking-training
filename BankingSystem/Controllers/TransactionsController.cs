@@ -17,30 +17,27 @@ namespace BankingSystem.Controllers
         // GET: Transactions
         public ActionResult Index()
         {
-            var transactions = db.Transactions.Include(t => t.Account);
-            return View(transactions.ToList());
-        }
-
-        // GET: Transactions/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
+            
+            List<Transaction> transactions;
+            if (Session["AccountID"] != null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                int accID = Int32.Parse(Session["AccountID"].ToString());
+                transactions = db.Transactions.Where(t => t.FromAccountNumber == accID).ToList();
             }
-            Transaction transaction = db.Transactions.Find(id);
-            if (transaction == null)
+            else
             {
-                return HttpNotFound();
+                int custID = Int32.Parse(Session["username"].ToString());
+                transactions = db.Transactions.Where(t => t.Account.CustomerID == custID).ToList();
             }
-            return View(transaction);
+            return View(transactions);
         }
 
         // GET: Transactions/Create
         public ActionResult Create()
         {
-            ViewBag.FromAccountNumber = new SelectList(db.Accounts, "ID", "ID");
-            return View();
+            Transaction transaction = new Transaction();
+            transaction.FromAccountNumber = int.Parse(Session["AccountID"].ToString());
+            return View(transaction);
         }
 
         // POST: Transactions/Create
@@ -48,77 +45,22 @@ namespace BankingSystem.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,FromAccountNumber,ToAccountNumber,ToBankName")] Transaction transaction)
+        public ActionResult Create([Bind(Include = "ID,FromAccountNumber,ToAccountNumber,ToBankName, Amount")] Transaction transaction)
         {
             if (ModelState.IsValid)
             {
                 db.Transactions.Add(transaction);
                 db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.FromAccountNumber = new SelectList(db.Accounts, "ID", "ID", transaction.FromAccountNumber);
-            return View(transaction);
-        }
-
-        // GET: Transactions/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Transaction transaction = db.Transactions.Find(id);
-            if (transaction == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.FromAccountNumber = new SelectList(db.Accounts, "ID", "ID", transaction.FromAccountNumber);
-            return View(transaction);
-        }
-
-        // POST: Transactions/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,FromAccountNumber,ToAccountNumber,ToBankName")] Transaction transaction)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(transaction).State = EntityState.Modified;
+                Account acc = db.Accounts.Where(a => a.ID == transaction.FromAccountNumber).FirstOrDefault();
+                acc.Balance -= transaction.Amount;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Home");
             }
+
             ViewBag.FromAccountNumber = new SelectList(db.Accounts, "ID", "ID", transaction.FromAccountNumber);
             return View(transaction);
         }
 
-        // GET: Transactions/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Transaction transaction = db.Transactions.Find(id);
-            if (transaction == null)
-            {
-                return HttpNotFound();
-            }
-            return View(transaction);
-        }
-
-        // POST: Transactions/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Transaction transaction = db.Transactions.Find(id);
-            db.Transactions.Remove(transaction);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
 
         protected override void Dispose(bool disposing)
         {
